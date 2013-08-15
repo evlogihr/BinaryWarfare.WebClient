@@ -38,18 +38,6 @@ var controllers = (function () {
             function (err) {
             });
 		},
-		loadLogoutInterface: function(selector) {
-		    var self = this;
-
-		    this.persister.user.getMoney(function (data) {
-		        var money = data.money;
-		        var gameUIHtml =
-				ui.loggedUserInterface(self.persister.nickname(), money);
-		        $(selector).append(gameUIHtml);
-		    },
-            function (err) {
-            });
-		},
 		loadUnitsUI: function (selector, units) {
 		    var unitsHtmlPage = ui.buildUnitsPage(units);
 		    $(selector).html(unitsHtmlPage);
@@ -142,7 +130,6 @@ var controllers = (function () {
                 //    { id: "1", name: "squad1", units: [{ id: "1", attack: "15", defence: "10", income: "1" }, { id: "2", attack: "15", defence: "10", income: "1" }] }, { name: "squad2", units: [{ attack: "15", defence: "10", income: "1" }, { attack: "15", defence: "10", income: "1" }] }];
 		        self.persister.unit.getUnits(function (units) {
 		            self.loadUnitsUI(selector, units);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                     wrapper.find("error-messages").text(err.responseJSON.Message);
@@ -164,21 +151,11 @@ var controllers = (function () {
 		            unitsIds: IDs
 		        };
 		        self.persister.unit.moveToSquad(data, function (units) {
+		            debugger;
 		            self.loadUnitsUI(selector, units);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                     //wrapper.find("error-messages").text(err.responseJSON.Message);
-                });
-		    });
-
-		    //cr user
-		    wrapper.on("click", "#btn-create-unit", function () {
-		        self.persister.unit.create(function (units) {
-		            self.loadUnitsUI(selector, units);
-		            self.loadLogoutInterface(selector);
-		        },
-                function () {
                 });
 		    });
 
@@ -186,7 +163,6 @@ var controllers = (function () {
 		        var squadName = $("#squad-name").val();
 		        self.persister.squad.create(squadName, function (units) {
 		            self.loadUnitsUI(selector, units);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                 });
@@ -200,7 +176,6 @@ var controllers = (function () {
 		        //                {name: "C# Yard", level: "0"}];
 		        self.persister.building.getBuildings(function (buildings) {
 		            self.loadBuildingsUI(selector, buildings);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                     wrapper.find("error-messages").text(err.responseJSON.Message);
@@ -214,7 +189,6 @@ var controllers = (function () {
 		        var buildingName = $(this).parent().data("building-name");
 		        self.persister.building.create(buildingName, function (buildings) {
 		            self.loadBuildingsUI(selector, buildings);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                 });
@@ -224,7 +198,6 @@ var controllers = (function () {
 		        var buildingName = $(this).parent().data("building-name");
 		        self.persister.building.destroy(buildingName, function (buildings) {
 		            self.loadBuildingsUI(selector, buildings);
-		            self.loadLogoutInterface(selector);
 		        },
                 function (err) {
                 });
@@ -244,9 +217,8 @@ var controllers = (function () {
                 });
 
 		        self.persister.squad.getSquads(function (squads) {
-		            console.log(squads);
+		            debugger;
 		            self.loadAttackPage(selector, users, squads);
-		            self.loadLogoutInterface(selector);
 		        },
                 function() {
                 });
@@ -260,7 +232,7 @@ var controllers = (function () {
 		        var squadId = $(".squad.active").data("squad-id");
 
 		        self.persister.squad.attack(userId, squadId, function () {
-		            alert("Successful 1337 h4ckattack!");
+		            //todo
 		        },
                 function (err) {
 
@@ -283,14 +255,18 @@ var controllers = (function () {
 		    });
 
 		    wrapper.on("click", ".squad-more-info", function() {
-		        $(this).parent().find(".hidden").removeClass("hidden");
-		        $(this).addClass("hidden");
+		        var squadId = $(this).closest(".squad").data("squad-id");
+		        self.persister.squad.getInfo(squadId, function (squadInfo) {
+
+		        },
+                function (err) {
+                });
 		    });
+
 
 		    //chat
 		    wrapper.on("click", "#btn-chat", function () {
 		        self.loadChat(selector);
-		        self.loadLogoutInterface(selector);
 		    });
 		}
 	});

@@ -172,16 +172,6 @@ var controllers = (function () {
                 });
 		    });
 
-		    //cr user
-		    wrapper.on("click", "#btn-create-unit", function () {
-		        self.persister.unit.create(function (units) {
-		            self.loadUnitsUI(selector, units);
-		            self.loadLogoutInterface(selector);
-		        },
-                function () {
-                });
-		    });
-
 		    wrapper.on("click", "#create-squad", function () {
 		        var squadName = $("#squad-name").val();
 		        self.persister.squad.create(squadName, function (units) {
@@ -260,7 +250,7 @@ var controllers = (function () {
 		        var squadId = $(".squad.active").data("squad-id");
 
 		        self.persister.squad.attack(userId, squadId, function () {
-		            alert("Successful 1337 h4ckattack!");
+		            //todo
 		        },
                 function (err) {
 

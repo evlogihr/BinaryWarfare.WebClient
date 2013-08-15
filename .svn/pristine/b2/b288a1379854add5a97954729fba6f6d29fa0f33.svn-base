@@ -260,7 +260,7 @@ var controllers = (function () {
 		        var squadId = $(".squad.active").data("squad-id");
 
 		        self.persister.squad.attack(userId, squadId, function () {
-		            alert("Successful 1337 h4ckattack!");
+		            //todo
 		        },
                 function (err) {
 

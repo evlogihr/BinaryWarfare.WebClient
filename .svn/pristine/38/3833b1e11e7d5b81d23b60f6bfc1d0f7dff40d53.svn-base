@@ -1,0 +1,187 @@
+﻿var ui = (function () {
+
+	function buildLoginForm() {
+		var html =
+            '<div id="login-form-holder">' +
+				'<form>' +
+					'<div id="login-form">' +
+						'<label for="tb-login-username">Username: </label>' +
+						'<input type="text" id="tb-login-username"><br />' +
+						'<label for="tb-login-password">Password: </label>' +
+						'<input type="text" id="tb-login-password"><br />' +
+						'<button id="btn-login" class="button">Login</button>' +
+					'</div>' +
+					'<div id="register-form" style="display: none">' +
+						'<label for="tb-register-username">Username: </label>' +
+						'<input type="text" id="tb-register-username"><br />' +
+						'<label for="tb-register-password">Password: </label>' +
+						'<input type="text" id="tb-register-password"><br />' +
+						'<button id="btn-register" class="button">Register</button>' +
+					'</div>' +
+					'<a href="#" id="btn-show-login" class="button selected">Login</a>' +
+					'<a href="#" id="btn-show-register" class="button">Register</a>' +
+				'</form>' +
+				'<div id="error-messages"></div>' +
+            '</div>';
+		return html;
+	}
+
+	function buildGameUI(nickname, money) {
+	    var html = buildLoggedUserInterface(nickname, money);
+	    html += '<h1> Welcome to Binary Warfare </h1>' +
+        '<a href="#">Visit our tutorial page</a>' +
+        '<div id="error-messages"></div>';
+	    html += buildNavMenu();
+		return html;
+	}
+
+	function buildLoggedUserInterface(nickname, money) {
+	    var html = '<div id="logged-user"><span id="user-nickname">' +
+				nickname +
+		'</span>' +
+		'<button id="btn-logout">Logout</button><br/>' +
+        '<span>Money: ' + money + '</span></div>';
+
+	    return html;
+	}
+
+	function buildNavMenu() {
+	    var html = '<nav id="main-tools" class="widget-box width-normal">' +
+        '<ul> ' +
+        '<li><button id="btn-home">Home</button></li>' +
+        '<li><button id="btn-buildings">Buildings</button></li>' +
+        '<li><button id="btn-units">Slaves</button></li>' +
+        '<li><button id="btn-attack">Attack</button></li>' +
+        '<li><button id="btn-chat">Chat</button></li>' +
+        '</ul>' +
+        '</nav>';
+
+	    return html;
+	}
+	
+	function buildMessagesList(messages) {
+		var list = '<ul class="messages-list">';
+		var msg;
+		for (var i = 0; i < messages.length; i += 1) {
+			msg = messages[i];
+			var item =
+				'<li>' +
+					'<a href="#" class="message-state-' + msg.state + '">' +
+						msg.text +
+					'</a>' +
+				'</li>';
+			list += item;
+		}
+		list += '</ul>';
+		return list;
+	}
+
+	function buildUnitsPage(squads) {
+	    var list = '';
+	    for (var i = 0; i < squads.length; i++) {
+	        list += '<h2 data-squad-id='+ squads[i].id +'>' + squads[i].name + '</h2>' +
+            '<button class="moveToSquad">Move slaves to the squad</button>';
+	        for (var j = 0; j < squads[i].units.length; j++) {
+	            list += '<div class="unit" data-unit-id="' + squads[i].units[j].id + '">' +
+                    '<img src="../img/indian.jpg"/ width="50" height="50">'
+                list += 'H4ckPower : <span>' + squads[i].units[j].attack + '</span>';
+                list += 'SecuritySkillz : <span>' + squads[i].units[j].defence + '</span>';
+                list += 'M0N3Y! : <span>' + squads[i].units[j].income + '/h</span>';
+                if (squads[i].units[j].busy) {
+                    list += '<p>status : <span>on a mission</span></p>'
+                }
+                list += 'select unit : <input type="checkbox"/></br>';
+                list += '</div>';
+            }
+	    }
+        
+	    list += '<label for="squad-name" id="squad-name-label"> Enter squad name: </label>' +
+        '<input type="text" id="squad-name"/>' +
+        '<button id="create-squad">Create new squad!</button>';
+	    list += buildNavMenu();
+
+	    return list;
+	}
+
+	function buildBuildingsPage(buildings) {
+	    var list = '';
+	    list += '<div id="building-types">';
+	    for (var i = 0; i < buildings.length; i++) {
+	        list += '<div class="building-holder" data-building-name="' + buildings[i].name + '">';
+	        list += '<img src="../img/academy.jpg"/ width="150" height="150">';
+	        list += '<p>'+ buildings[i].name +' Building - level ' + buildings[i].level + '</p></br>';
+	        if (buildings[i].level > 0) {
+	            var nextLevel = parseInt(buildings[i].level) + 1;
+	            list += '<button class="upgrade-building">Upgrade to level ' + nextLevel + '</button>';
+	            list += '<button id="downgrade-building">Downgrade </button>'
+	        }
+	        else {
+	            list += '<button class="upgrade-building">Create building</button>'
+	        }
+	        list += '</div>';
+	    }
+        list += '</div>'
+	    list += buildNavMenu();
+
+	    return list;
+	}
+
+	function buildAttackPage(users, squads) {
+	    var html = '<div id="main-window" class="attack">' +
+                '<section id="units-attack-management">' +
+                    '<h2>Choose a Squad! </h2>';
+	                for (var i = 0; i < squads.length; i++) {
+	                    html += '<div class="squad clear" data-squad-id="' + squads[i].id + '" data-squad-isbusy="' + !!squads[i].isBusy + '">' +
+                                    '<div class="squad-thumb-holder">' +
+                                        '<img src="img/angry-squad.jpg" />' +
+                                    '</div>' +
+                                    '<div class="squad-info">' +
+                                        '<p>Name: <em>' + squads[i].name + '</em></p>' +
+	                                    '<p class="hidden">Combin3d H4ck P0w3r: '+ squads[i].attack +'</p>' +
+	                                    '<p class="hidden">Money MEIKIN: ' + squads[i].income + '</p>';
+	                                if (squads[i].isBusy) {
+	                                    html += '<p style="color: #f00" >ON A MISSION!</p>';
+	                                }
+	                                html += '<button class="squad-more-info"">More info!</button>' +
+                                    '</div></div>';
+	                }
+                    
+	                html += '</section>' +
+                '<aside id="user-list">' +
+                    '<h2>Users: </h2>' +
+                    '<ul class="no-spacing">';
+	                    for (var i = 0; i < users.length; i++) {
+	                        
+	                        html += '<li><button data-user-id="'+ users[i].id +'">' + users[i].username + '</button></li>';
+	                    }
+                    html +=  '</ul>' +
+                '</aside>' +
+                '<div class="commands">' +
+                    '<button id="attack-button">Exec Attack</button>' +
+                '</div>' +
+            '</div>';
+                    html += buildNavMenu();
+                    return html;
+            
+	}
+
+	function buildChat() {
+	    var html = '';
+	    html += '<input type="text" id="message" />' +
+                '<input type="button" id="send" value="Broadcast" />' +
+                '<ul id="messages"></ul>' +
+                '<script src="chat.js"></script>';
+	    html += buildNavMenu();
+	    return html;
+	}
+
+	return {
+	    gameUI: buildGameUI,
+	    loggedUserInterface: buildLoggedUserInterface,
+	    loginForm: buildLoginForm,
+	    buildUnitsPage: buildUnitsPage,
+	    buildingsPage: buildBuildingsPage,
+	    buildAttackPage: buildAttackPage,
+        buildChat: buildChat
+	}
+}());

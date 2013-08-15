@@ -1,0 +1,375 @@
+html, body, nav, ul, li, table, td, tr, section, header, div, p, span, img, h1, h2, h3 {
+  margin: 0;
+  padding: 0; }
+
+img {
+  max-width: 100%; }
+
+html {
+  font: normal 14px Helvetica, Arial, 'DejaVu Sans', 'Liberation Sans', Freesans, sans-serif; }
+
+body {
+  background: url(../img/bg_2_.png); }
+  body #wrapper {
+    width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 50px; }
+    body #wrapper .unit {
+      font-size: 1.2rem; }
+      body #wrapper .unit span {
+        color: #A00;
+        border-right: 1px solid black;
+        margin-right: 5px;
+        padding-right: 5px; }
+    body #wrapper .building-holder {
+      width: 250px;
+      display: inline-block; }
+
+button,
+.button {
+    color: #808080;
+    font-size: 16px;
+    font-family: Arial, 'DejaVu Sans', 'Liberation Sans', Freesans, sans-serif;
+    font-weight: bold;
+    height: 40px;
+    background: #FFF;
+    border: 1px solid #CCC;
+    text-decoration: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+    button:hover,
+    .button:hover {
+        border: 1px solid #808080;
+    }
+
+#content {
+    border: 2px solid black;
+    padding: 20px 0;
+    height: 500px;
+    position: relative;
+    background: #fff;
+    box-shadow: 0 0 5px #7C7C7C;
+}
+
+    #content.home {
+        background: #fff url(../img/binary-warfare.jpg) no-repeat center bottom;
+    }
+
+input {
+    line-height: 22px;
+}
+
+#btn-register,
+#btn-login {
+    margin: 20px 0;
+    position: absolute;
+    top: 0;
+    right: 235px;
+}
+
+#btn-show-register {
+    margin-right: 10px;
+    position: absolute;
+    top: 0;
+    padding: 0;
+    height: 25px;
+    left: 155px;
+}
+
+#btn-show-login {
+    margin-right: 10px;
+    position: absolute;
+    top: 0;
+    padding: 0;
+    height: 25px;
+    left: 55px;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+#game-title {
+    text-shadow: 2px 1px 6px #000;
+    color: #FFFFFF;
+}
+
+header {
+    height: 100px;
+}
+
+footer {
+    border: 1px solid black;
+    padding: 20px;
+    background: #eee;
+    box-shadow: inset 0 0 3px;
+}
+
+label {
+    color: #3b3a3a;
+    font-size: 20px;
+}
+
+#tb-login-username {
+    margin-left: 0px;
+}
+
+#tb-register-nickname {
+    margin-right: -1px;
+}
+
+.widget-box {
+    text-align: left;
+}
+
+    .widget-box.width-normal {
+        width: 200px;
+    }
+
+        .widget-box.width-normal button {
+            width: 200px;
+        }
+
+    .widget-box ul {
+        list-style-type: none;
+        position: relative;
+        padding: 0;
+    }
+
+        .widget-box ul li {
+            display: inline-block;
+            width: 100%;
+            clear: right;
+        }
+
+#main-tools {
+    position: absolute;
+    top: 20px;
+    left: -130px;
+}
+
+#main-window {
+    border: 1px solid #808080;
+    width: 700px;
+    height: 400px;
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    overflow: auto;
+}
+
+button.active, .button.active {
+    background: #3D3D3D;
+    color: #eee;
+}
+
+.hidden {
+    display: none;
+}
+
+#logged-user {
+    position: absolute;
+    top: -30px;
+    right: -20px;
+    background-color: #FFF;
+    border: 1px solid #7C7C7C;
+}
+
+#building-types {
+    position: relative;
+    height: inherit;
+}
+
+.building {
+    background: url(../img/building-placeholder.jpg) no-repeat;
+    width: 195px;
+    height: 155px;
+    position: absolute;
+    border: 1px solid #808080;
+}
+
+    .building button.create-or-update {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        opacity: 0.4;
+        box-shadow: inset 0 0 3px #000; 
+    }
+
+.building button.create-or-update:hover {
+    opacity: 1;
+}
+
+    .building.tl; {
+        top: 0;
+        left: 0;
+    }
+
+    .building.tr {
+        top: 0;
+        right: 0;
+    }
+
+    .building.tc {
+        top: 0;
+        left: 50%;
+        margin-left: -90px;
+    }
+
+    .building.bl {
+        bottom: 0;
+        left: 0;
+    }
+
+    .building.br {
+        bottom: 0;
+        right: 0;
+    }
+
+    .building.bc {
+        bottom: 0;
+        left: 50%;
+        margin-left: -90px;
+    }
+
+
+    .building .bottom-info {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        width: 100%;
+        background: #eee;
+        box-shadow: inset 0 0 3px #000;
+        opacity: 0.6;
+    }
+
+    .building .bottom-info:hover {
+        opacity: 1;
+    }
+
+#units-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+    #units-table td {
+        border: 1px solid #808080;
+        padding: 5px 0;
+    }
+
+aside#user-list {
+    float: right;
+    width: 200px;
+    margin: 10px;
+    height: 310px;
+    overflow: scroll;
+    padding: 0px 20px;
+    border: 1px solid #666;
+}
+
+    aside#user-list button {
+        width: 100%;
+    }
+
+ul.no-spacing {
+    padding: 0;
+    list-style: none;
+}
+
+#main-window.attack .commands {
+    position: absolute;
+    bottom: 0;
+    padding: 20px 10px;
+}
+
+#attack-button {
+    float: right;
+    position: relative;
+    left: 500px;
+    width: 170px;
+}
+
+#units-attack-management {
+    padding: 10px;
+    width: 370px;
+    height: 342px;
+    float: left;
+    border: 1px solid #696969;
+    margin-left: 15px;
+    margin-top: 11px;
+    overflow: auto;
+}
+
+.squad {
+    border: 1px solid #AAA;
+    width: 100%;
+}
+
+    .squad:hover,
+    .squad.active {
+        outline: 2px solid;
+        cursor: pointer;
+    }
+
+    .squad.active {
+        background-color: #eee;
+    }
+
+.squad-thumb-holder {
+    width: 80px;
+    height: 80px;
+    margin: 10px;
+    float: left;
+}
+
+.squad-info {
+    float: left;
+    width: 235px;
+    text-align: left;
+    margin-left: 8px;
+}
+
+#create-squad {
+    width: 150px;
+    height: 100px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    text-align: left;
+}
+    #create-squad h2 {
+        margin: 5px 0;
+    }
+
+#squad-name {
+    width: 150px;
+    height: 30px;
+    position: absolute;
+    bottom: 100px;
+    right: 0;
+    text-align: left;
+}
+
+#squad-name-label {
+    width: 150px;
+    height: 100px;
+    position: absolute;
+    bottom: 100px;
+    right: 0;
+    text-align: left;
+}
+
+.clear:after {
+    content: '';
+    clear: both;
+    display: block;
+}
+
+#messages {
+    list-style-type: none;
+}
+
