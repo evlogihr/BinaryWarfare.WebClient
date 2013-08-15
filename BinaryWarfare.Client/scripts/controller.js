@@ -5,7 +5,8 @@
 
 var controllers = (function () {
 
-	var updateTimer = null;
+    var updateTimer = null;
+    var firstTime = true;
 
 	var rootUrl = "http://localhost:49948/api/";
 	var Controller = Class.create({
@@ -25,31 +26,43 @@ var controllers = (function () {
 			var loginFormHtml = ui.loginForm()
 			$(selector).html(loginFormHtml);
 		},
-		loadGameUI: function (selector) {
+		loadGameUI: function (selector, money) {
 		    var self = this;
-		    var money = 0;
-		    var income = 0;
-		    self.persister.money.getMoney(function (moneyAmount) {
-		        money = moneyAmount;
-		    },
-            function () {
-            });
 
 			var gameUIHtml =
 				ui.gameUI(this.persister.nickname(), money);
 			$(selector).html(gameUIHtml);
 		},
-		loadUnitsUI: function(selector, units) {
-		    var unitsPageHtml = ui.unitsPage(units);
-		    $(selector).html(unitsPageHtml);
+		loadUnitsUI: function (selector, units) {
+		    var unitsHtmlPage = ui.buildUnitsPage(units);
+		    $(selector).html(unitsHtmlPage);
 		},
 		loadBuildingsUI: function (selector, buildings) {
-		    var buildingsPageHtml = ui.buildingsPage(buildings);
+		    var buildingsPageHtml = ui.buildingsPage(buildings.buildings);
 		    $(selector).html(buildingsPageHtml);
 		},
 		loadAttackPage: function (selector, users, squads) {
 		    var attackPageHtml = ui.buildAttackPage(users, squads);
 		    $(selector).html(attackPageHtml);
+		},
+		loadChat: function (selector) {
+		    var chatHtml = ui.buildChat();
+		    //var self = this;
+		    
+		    //$(function () {
+		    //    var chat = $.connection.message;
+
+		    //    chat.client.displayMessage = function (message) {
+		    //        $("#messages").prepend("<li>" + message + "</li>");
+		    //    }
+		    //    $.connection.hub.start().done(function () {
+		    //        $("#send").click(function () {
+		    //            chat.server.sendMessage(self.persister.nickname() + ' : ' + $("#message").val())
+		    //        });
+		    //    });
+		    //});
+
+		    $(selector).html(chatHtml);
 		},
 		attachUIEventHandlers: function (selector) {
 		    var wrapper = $(selector);
@@ -74,8 +87,8 @@ var controllers = (function () {
 		            password: $(selector + " #tb-login-password").val()
 		        }
 
-		        self.persister.user.login(user, function () {
-		            self.loadGameUI(selector);
+		        self.persister.user.login(user, function (userDetails) {
+		            self.loadGameUI(selector, userDetails.money);
 		        }, function (err) {
 		            wrapper.find("#error-messages").text(err.responseJSON.Message);
 		        });
@@ -108,14 +121,15 @@ var controllers = (function () {
 
             //units stuff
 		    wrapper.on("click", "#btn-units", function () {
-		        var units = [
-                    { id: "1", name: "squad1", units: [{ id: "1", attack: "15", defence: "10", income: "1" }, { id: "2", attack: "15", defence: "10", income: "1" }] }, { name: "squad2", units: [{ attack: "15", defence: "10", income: "1" }, { attack: "15", defence: "10", income: "1" }] }];
-			    //self.persister.unit.getUnits(function (units) {
-			        self.loadUnitsUI(selector, units);
-			    //},
-                //function (err) {
-                //    wrapper.find("error-messages").text(err.responseJSON.Message);
-                //})
+		        //var units = [
+                //    { id: "1", name: "squad1", units: [{ id: "1", attack: "15", defence: "10", income: "1" }, { id: "2", attack: "15", defence: "10", income: "1" }] }, { name: "squad2", units: [{ attack: "15", defence: "10", income: "1" }, { attack: "15", defence: "10", income: "1" }] }];
+		        self.persister.unit.getUnits(function (units) {
+		            self.loadUnitsUI(selector, units);
+		        },
+                function (err) {
+                    wrapper.find("error-messages").text(err.responseJSON.Message);
+                });
+
 			    $("#main-tools .active").removeClass("active");
 			    $(this).addClass("active");
 		    });
@@ -129,10 +143,11 @@ var controllers = (function () {
 
 		        var data = {
 		            squadId: squadId,
-		            units: IDs
+		            unitsIds: IDs
 		        };
 		        self.persister.unit.moveToSquad(data, function (units) {
-		            loadUnitsUI(selector, units);
+		            debugger;
+		            self.loadUnitsUI(selector, units);
 		        },
                 function (err) {
                     //wrapper.find("error-messages").text(err.responseJSON.Message);
@@ -152,16 +167,35 @@ var controllers = (function () {
 
 		    wrapper.on("click", "#btn-buildings", function () {
 
-		        var buildings = [{ name: "academy", level: "2" },
-		                        {name: "C# Yard", level: "0"}];
-		        //self.persister.building.getBuildings(function (buildings) {
+		        //var buildings = [{ name: "academy", level: "2" },
+		        //                {name: "C# Yard", level: "0"}];
+		        self.persister.building.getBuildings(function (buildings) {
 		            self.loadBuildingsUI(selector, buildings);
-		        //},
-                //function (err) {
-                //    wrapper.find("error-messages").text(err.responseJSON.Message);
-		        //});
+		        },
+                function (err) {
+                    wrapper.find("error-messages").text(err.responseJSON.Message);
+		        });
 		        $("#main-tools .active").removeClass("active");
 		        $(this).addClass("active");
+		    });
+
+            //upg
+		    wrapper.on("click", ".upgrade-building", function () {
+		        var buildingName = $(this).parent().data("building-name");
+		        self.persister.building.create(buildingName, function (buildings) {
+		            self.loadBuildingsUI(selector, buildings);
+		        },
+                function (err) {
+                });
+		    });
+		    //downg
+		    wrapper.on("click", "#downgrade-building", function () {
+		        var buildingName = $(this).parent().data("building-name");
+		        self.persister.building.destroy(buildingName, function (buildings) {
+		            self.loadBuildingsUI(selector, buildings);
+		        },
+                function (err) {
+                });
 		    });
 
 		    //attack page
@@ -221,6 +255,12 @@ var controllers = (function () {
 		        },
                 function (err) {
                 });
+		    });
+
+
+		    //chat
+		    wrapper.on("click", "#btn-chat", function () {
+		        self.loadChat(selector);
 		    });
 		}
 	});

@@ -1,0 +1,277 @@
+﻿/// <reference path="class.js" />
+/// <reference path="persister.js" />
+/// <reference path="jquery-2.0.2.js" />
+/// <reference path="ui.js" />
+
+var controllers = (function () {
+
+    var updateTimer = null;
+    var firstTime = true;
+
+	var rootUrl = "http://binarywarfare.apphb.com/api/";
+	var Controller = Class.create({
+		init: function () {
+			this.persister = persisters.get(rootUrl);
+		},
+		loadUI: function (selector) {
+			if (this.persister.isUserLoggedIn()) {
+				this.loadGameUI(selector);
+			}
+			else {
+				this.loadLoginFormUI(selector);
+			}
+			this.attachUIEventHandlers(selector);
+		},
+		loadLoginFormUI: function (selector) {
+			var loginFormHtml = ui.loginForm()
+			$(selector).html(loginFormHtml);
+		},
+		loadGameUI: function (selector, money) {
+		    var self = this;
+
+			var gameUIHtml =
+				ui.gameUI(this.persister.nickname(), money);
+			$(selector).html(gameUIHtml);
+		},
+		loadUnitsUI: function (selector, units) {
+		    var unitsHtmlPage = ui.buildUnitsPage(units);
+		    $(selector).html(unitsHtmlPage);
+		},
+		loadBuildingsUI: function (selector, buildings) {
+		    var buildingsPageHtml = ui.buildingsPage(buildings.buildings);
+		    $(selector).html(buildingsPageHtml);
+		},
+		loadAttackPage: function (selector, users, squads) {
+		    var attackPageHtml = ui.buildAttackPage(users, squads);
+		    $(selector).html(attackPageHtml);
+		},
+		loadChat: function (selector) {
+		    var chatHtml = ui.buildChat();
+		    //var self = this;
+		    
+		    //$(function () {
+		    //    var chat = $.connection.message;
+
+		    //    chat.client.displayMessage = function (message) {
+		    //        $("#messages").prepend("<li>" + message + "</li>");
+		    //    }
+		    //    $.connection.hub.start().done(function () {
+		    //        $("#send").click(function () {
+		    //            chat.server.sendMessage(self.persister.nickname() + ' : ' + $("#message").val())
+		    //        });
+		    //    });
+		    //});
+
+		    $(selector).html(chatHtml);
+		},
+		attachUIEventHandlers: function (selector) {
+		    var wrapper = $(selector);
+		    var self = this;
+
+		    wrapper.on("click", "#btn-show-login", function () {
+		        wrapper.find(".button.selected").removeClass("selected");
+		        $(this).addClass("selected");
+		        wrapper.find("#login-form").show();
+		        wrapper.find("#register-form").hide();
+		    });
+		    wrapper.on("click", "#btn-show-register", function () {
+		        wrapper.find(".button.selected").removeClass("selected");
+		        $(this).addClass("selected");
+		        wrapper.find("#register-form").show();
+		        wrapper.find("#login-form").hide();
+		    });
+
+		    wrapper.on("click", "#btn-login", function () {
+		        var user = {
+		            username: $(selector + " #tb-login-username").val(),
+		            password: $(selector + " #tb-login-password").val()
+		        }
+
+		        self.persister.user.login(user, function (userDetails) {
+		            self.loadGameUI(selector, userDetails.money);
+		        }, function (err) {
+		            wrapper.find("#error-messages").text(err.responseJSON.Message);
+		        });
+		        return false;
+		    });
+		    wrapper.on("click", "#btn-register", function () {
+		        var user = {
+		            username: $(selector).find("#tb-register-username").val(),
+		            password: $(selector + " #tb-register-password").val()
+		        }
+		        self.persister.user.register(user, function () {
+		            self.loadGameUI(selector);
+		        }, function (err) {
+		            wrapper.find("#error-messages").text(err.responseJSON.Message);
+		        });
+		        return false;
+		    });
+		    wrapper.on("click", "#btn-logout", function () {
+		        self.persister.user.logout(function () {
+		            self.loadLoginFormUI(selector);
+		        }, function (err) {
+		        });
+		    });
+
+		    wrapper.on("click", "#btn-home", function () {
+		        self.loadGameUI(selector);
+		        $("#main-tools .active").removeClass("active");
+		        $(this).addClass("active");
+		    });
+
+            //units stuff
+		    wrapper.on("click", "#btn-units", function () {
+		        //var units = [
+                //    { id: "1", name: "squad1", units: [{ id: "1", attack: "15", defence: "10", income: "1" }, { id: "2", attack: "15", defence: "10", income: "1" }] }, { name: "squad2", units: [{ attack: "15", defence: "10", income: "1" }, { attack: "15", defence: "10", income: "1" }] }];
+		        self.persister.unit.getUnits(function (units) {
+		            self.loadUnitsUI(selector, units);
+		        },
+                function (err) {
+                    wrapper.find("error-messages").text(err.responseJSON.Message);
+                });
+
+			    $("#main-tools .active").removeClass("active");
+			    $(this).addClass("active");
+		    });
+
+		    wrapper.on("click", ".moveToSquad", function () {
+		        var squadId = $(this).prev().data("squad-id");
+		        var units = $(this).parent().find("input").filter(":checked").parent().data("unit-id");
+
+		        var IDs = [];
+		        $(this).parent().find("input").filter(":checked").parent().each(function (ind, el) { IDs.push(parseInt($(el).data('unit-id'))) });
+
+		        var data = {
+		            squadId: squadId,
+		            unitsIds: IDs
+		        };
+		        self.persister.unit.moveToSquad(data, function (units) {
+		            debugger;
+		            self.loadUnitsUI(selector, units);
+		        },
+                function (err) {
+                    //wrapper.find("error-messages").text(err.responseJSON.Message);
+                });
+		    });
+
+		    wrapper.on("click", "#create-squad", function () {
+		        var squadName = $("#squad-name").val();
+		        self.persister.squad.create(squadName, function (units) {
+		            self.loadUnitsUI(selector, units);
+		        },
+                function (err) {
+                });
+		    });
+
+            //buildings
+
+		    wrapper.on("click", "#btn-buildings", function () {
+
+		        //var buildings = [{ name: "academy", level: "2" },
+		        //                {name: "C# Yard", level: "0"}];
+		        self.persister.building.getBuildings(function (buildings) {
+		            self.loadBuildingsUI(selector, buildings);
+		        },
+                function (err) {
+                    wrapper.find("error-messages").text(err.responseJSON.Message);
+		        });
+		        $("#main-tools .active").removeClass("active");
+		        $(this).addClass("active");
+		    });
+
+            //upg
+		    wrapper.on("click", ".upgrade-building", function () {
+		        var buildingName = $(this).parent().data("building-name");
+		        self.persister.building.create(buildingName, function (buildings) {
+		            self.loadBuildingsUI(selector, buildings);
+		        },
+                function (err) {
+                });
+		    });
+		    //downg
+		    wrapper.on("click", "#downgrade-building", function () {
+		        var buildingName = $(this).parent().data("building-name");
+		        self.persister.building.destroy(buildingName, function (buildings) {
+		            self.loadBuildingsUI(selector, buildings);
+		        },
+                function (err) {
+                });
+		    });
+
+		    //attack page
+
+		    wrapper.on("click", "#btn-attack", function () {
+		        var users = [{ username: "pesho", id: "1"}, { username: "gosho", id: "2"}];
+		        var squads = [{ id: "1", name: "squad1", isBusy: true }, { id: "2", name: "squad2", isBusy: false }, { id: "3", name: "squad3", isBusy: false }];
+		        //var users = [];
+
+		        //self.persister.user.getUsers(function (users) {
+		        //    users = users;
+		        //},
+                //function (err) {
+                //});
+
+		        //self.persister.squad.getSquads(function (squads) {
+		            self.loadAttackPage(selector, users, squads);
+		        //},
+                //function() {
+                //});
+		        $("#main-tools .active").removeClass("active");
+		        $(this).addClass("active");
+		    });
+
+            //exec attack
+		    wrapper.on("click", "#attack-button", function () {
+		        var userId = $("#user-list .active").data("user-id");
+		        var squadId = $(".squad.active").data("squad-id");
+
+		        self.persister.squad.attack(userId, squadId, function () {
+		            //todo
+		        },
+                function (err) {
+
+                });
+		    });
+
+            //select user
+		    wrapper.on("click", "#user-list button", function () {
+		        $("#user-list button").removeClass("active");
+		        $(this).addClass("active");
+		    });
+
+            //select squad
+		    wrapper.on("click", ".squad", function () {
+		        var squad = $(this);
+		        if (!squad.data("squad-isbusy")) {
+		            $(".squad").removeClass("active");
+		            squad.addClass("active");
+		        };
+		    });
+
+		    wrapper.on("click", ".squad-more-info", function() {
+		        var squadId = $(this).closest(".squad").data("squad-id");
+		        self.persister.squad.getInfo(squadId, function (squadInfo) {
+
+		        },
+                function (err) {
+                });
+		    });
+
+
+		    //chat
+		    wrapper.on("click", "#btn-chat", function () {
+		        self.loadChat(selector);
+		    });
+		}
+	});
+	return {
+		get: function () {
+			return new Controller();
+		}
+	}
+}());
+
+$(function () {
+	var controller = controllers.get();
+	controller.loadUI("#content");
+});
